@@ -189,7 +189,7 @@ const Profiles = () => {
                 handleClose={() => setShow(false)}
                 profileEdit={profileEdit}
                 setProfileEdit={setProfileEdit}
-                callback={() => getProfiles()}
+                callback={() => getProfiles({page: 1, limit: rowsPerPage})}
             />
         </div>
     );

@@ -138,7 +138,7 @@ const Documents = () => {
 
     useEffect(() => {
         if (!effectRan.current) {
-            getDocuments({ page: currentPage, limit: rowsPerPage });
+            getDocuments({ page: 1, limit: rowsPerPage });
             effectRan.current = true;
         }
     }, []);
@@ -190,7 +190,7 @@ const Documents = () => {
                 handleClose={() => setShow(false)}
                 updateDocument={updateDocument}
                 setUpdateDocument={setUpdateDocument}
-                callback={() => callback()}
+                callback={() => callback({ page: 1, limit: rowsPerPage })}
             />
         </div>
     );
