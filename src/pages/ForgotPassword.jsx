@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const Login = () => {
+const ForgotPassword = () => {
     const {
         register,
         handleSubmit,
@@ -17,7 +17,7 @@ const Login = () => {
     const handleLogin = (values) => {
         startTransition(async () => {
             await axios
-                .post(`${import.meta.env.VITE_API_BASE_PATH}login`, values)
+                .post(`${import.meta.env.VITE_API_BASE_PATH}loginn`, values)
                 .then((response) => {
                     if (response.status === 200) {
                         localStorage.setItem('token', response.data.token);
@@ -57,27 +57,12 @@ const Login = () => {
 
                                     <Form onSubmit={handleSubmit(handleLogin)}>
                                         <Form.Group className="mb-3" controlId="formEmail">
-                                            <Form.Label>Username</Form.Label>
+                                            <Form.Label>Registered Email</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                placeholder="Username"
+                                                placeholder="Email"
                                                 className="rounded-3"
-                                                {...register('username', {
-                                                    required: 'This field is required',
-                                                })}
-                                            />
-                                            <Form.Control.Feedback type="invalid">
-                                                {errors.name?.message}
-                                            </Form.Control.Feedback>
-                                        </Form.Group>
-
-                                        <Form.Group className="mb-4" controlId="formPassword">
-                                            <Form.Label>Password</Form.Label>
-                                            <Form.Control
-                                                type="password"
-                                                placeholder="••••••••"
-                                                className="rounded-3"
-                                                {...register('password', {
+                                                {...register('email', {
                                                     required: 'This field is required',
                                                 })}
                                             />
@@ -100,7 +85,7 @@ const Login = () => {
                                                 </button>
                                             ) : (
                                                 <button type="submit" className="btn-red rounded-3">
-                                                    Login
+                                                    Submit
                                                 </button>
                                             )}
                                         </div>
@@ -108,10 +93,10 @@ const Login = () => {
 
                                     <div className="text-center mt-3">
                                         <Link
-                                            to="/forgot-password"
+                                            to="/"
                                             className="text-decoration-none text-muted small"
                                         >
-                                            Forgot your password?
+                                            Back to Login
                                         </Link>
                                     </div>
                                 </Card.Body>
@@ -124,4 +109,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default ForgotPassword;

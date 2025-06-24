@@ -123,7 +123,7 @@ const CreateProfileModal = ({ show, handleClose, profileEdit, setProfileEdit, ca
 
                     <Form.Group className="mb-3">
                         <Form.Label>Documents</Form.Label>
-                        <div className="d-flex">
+                        <div className="d-flex flex-wrap">
                             {documents?.data ? documents.data.map((doc) => (
                                 <Form.Check
                                     key={doc.document_enc_id}

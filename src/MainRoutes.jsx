@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Login from './pages/Login';;
 import ProtectedRoutes from './helpers/ProtectedRoutes';
+import ForgotPassword from './pages/ForgotPassword';
 
 const MainRoutes = () => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -20,6 +21,7 @@ const MainRoutes = () => {
                     )
                 }
             />
+            <Route path="forgot-password" element={<ForgotPassword/>} />
             <Route path="/*" element={<ProtectedRoutes />} />
         </Routes>
     );
