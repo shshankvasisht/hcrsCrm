@@ -198,8 +198,13 @@
   margin-top: 20px;
 }
 .notification-link{
-  text-decoration: none;
-  color: #222;
+    text-decoration: none;
+    color: #222;
+    font-weight: 400;
+    font-size: 14px;
+}
+.notification-link-bold{
+  font-weight: 500;
 }
 @keyframes logo-spin {
   from {

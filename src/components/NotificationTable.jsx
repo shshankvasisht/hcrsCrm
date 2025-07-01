@@ -7,7 +7,7 @@ import ReactPaginate from 'react-paginate';
 
 const NotificationTable = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
     const [allNotifications, setAllNotifications] = useState('');
 
     const getNotifications = async (filters) => {
@@ -29,13 +29,39 @@ const NotificationTable = () => {
     };
 
     const effectRan = useRef(false);
+
+    const changeNotificationStatus = (id) => {
+        axios.post(`${import.meta.env.VITE_API_BASE_PATH}update-notification`, {notification_enc_id: id}, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        }).then((response => {
+            if(response.data.status === 200){
+                chnageStaticStatus(id);        
+            }
+        }))
+    }
+
+    const chnageStaticStatus = (id) => {
+        let allNotifys = [...allNotifications.data];
+        let nIndex = allNotifys.findIndex(item => item.notification_enc_id === id);
+        allNotifys[nIndex].status = "1";
+        
+        setAllNotifications({...allNotifications, data: allNotifys})
+        
+
+    }
     const columns = [
         {
             name: 'Updates',
             sortable: true,
             cell: (row) => {
                 return (
-                    <a href={row.notification_link} target="_blank" className="notification-link">
+                    <a 
+                        href={row.notification_link} 
+                        onClick={() => changeNotificationStatus(row.notification_enc_id)} 
+                        target="_blank" 
+                        className={`notification-link ${row.status === "0" ? "notification-link-bold" : ""}`}>
                         {row.notification}
                     </a>
                 );

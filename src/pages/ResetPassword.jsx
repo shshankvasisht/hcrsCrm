@@ -1,34 +1,32 @@
 import axios from 'axios';
 import { useTransition } from 'react';
-import { Container, Row, Col, Card, Form } from 'react-bootstrap';
+import { Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const Login = () => {
+const ResetPassword = () => {
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors },
     } = useForm({});
-    const navigate = useNavigate();
     const [isLoading, startTransition] = useTransition();
+    const params = useParams();
+    // Watch the password field to compare
+    const password = watch('password');
 
-    const handleLogin = (values) => {
+    const handleUpdatePassword = (values) => {
+        values["username"]= params.username;
         startTransition(async () => {
             await axios
-                .post(`${import.meta.env.VITE_API_BASE_PATH}login`, values)
+                .post(`${import.meta.env.VITE_API_BASE_PATH}update-password`, values)
                 .then((response) => {
                     if (response.data.status === 200) {
-                        localStorage.setItem('token', response.data.token);
-                        localStorage.setItem('user', JSON.stringify(response.data.user));
-                        if (response.data.user.user_type === '2') {
-                            navigate('/admin/dashboard');
-                        } else {
-                            navigate('/user/dashboard');
-                        }
+                        toast.success('Password updated successfully');
                     } else {
-                        toast.error(response.data.message);
+                        toast.error('Some error occured');
                     }
                 })
                 .catch((error) => {
@@ -55,34 +53,41 @@ const Login = () => {
                                         />
                                     </div>
 
-                                    <Form onSubmit={handleSubmit(handleLogin)}>
-                                        <Form.Group className="mb-3" controlId="formEmail">
-                                            <Form.Label>Username</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Username"
-                                                className="rounded-3"
-                                                {...register('username', {
-                                                    required: 'This field is required',
-                                                })}
-                                            />
-                                            <Form.Control.Feedback type="invalid">
-                                                {errors.name?.message}
-                                            </Form.Control.Feedback>
-                                        </Form.Group>
-
-                                        <Form.Group className="mb-4" controlId="formPassword">
+                                    <Form onSubmit={handleSubmit(handleUpdatePassword)}>
+                                        <Form.Group className="mb-3">
                                             <Form.Label>Password</Form.Label>
                                             <Form.Control
-                                                type="password"
-                                                placeholder="*****"
-                                                className="rounded-3"
                                                 {...register('password', {
-                                                    required: 'This field is required',
+                                                    required: 'Password is required',
+                                                    minLength: {
+                                                        value: 6,
+                                                        message:
+                                                            'Password must be at least 6 characters',
+                                                    },
                                                 })}
+                                                type="password"
+                                                placeholder="Enter password"
+                                                isInvalid={!!errors.password}
                                             />
                                             <Form.Control.Feedback type="invalid">
-                                                {errors.name?.message}
+                                                {errors.password?.message}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                        <Form.Group className="mb-3" controlId="formEmail">
+                                            <Form.Label>Confirm Password</Form.Label>
+                                            <Form.Control
+                                                {...register('confirm_password', {
+                                                    required: 'Confirm Password is required',
+                                                    validate: (value) =>
+                                                        value === password ||
+                                                        'Passwords do not match',
+                                                })}
+                                                type="password"
+                                                placeholder="Enter password"
+                                                isInvalid={!!errors.confirm_password}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errors.confirm_password?.message}
                                             </Form.Control.Feedback>
                                         </Form.Group>
 
@@ -100,7 +105,7 @@ const Login = () => {
                                                 </button>
                                             ) : (
                                                 <button type="submit" className="btn-red rounded-3">
-                                                    Login
+                                                    Submit
                                                 </button>
                                             )}
                                         </div>
@@ -108,10 +113,10 @@ const Login = () => {
 
                                     <div className="text-center mt-3">
                                         <Link
-                                            to="/forgot-password"
+                                            to="/"
                                             className="text-decoration-none text-muted small"
                                         >
-                                            Forgot your password?
+                                            Back to Login
                                         </Link>
                                     </div>
                                 </Card.Body>
@@ -124,4 +129,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default ResetPassword;

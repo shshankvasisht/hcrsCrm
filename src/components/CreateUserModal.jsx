@@ -91,7 +91,6 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
     }
 
     useEffect(() => {
-        console.log(updateUser);
         if(updateUser){
             setValue('fullName', updateUser.name ? updateUser.name : "");
             setValue('phone', updateUser.phone ? updateUser.phone : "");

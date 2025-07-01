@@ -9,11 +9,12 @@ import { FaCheck, FaPlus } from 'react-icons/fa';
 import { MdClose } from 'react-icons/md';
 import { FaTrash } from 'react-icons/fa6';
 import { useParams } from 'react-router-dom';
-// import { Tabs } from "react-bootstrap";
+import RejectionReasonModal from './RejectionReasonModal';
 
 const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => {
     const [userDetails, setUserDetails] = useState('');
     const [uploadedDocuments, setUploadedDocuments] = useState('');
+    const [showRejectionModal, setShowRejectionModal] = useState('');
     const params = useParams();
     const hideSideBar = () => {
         setShowSidebar(false);
@@ -180,8 +181,12 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
         }
     };
 
-    const handleStatus = async (status, assigned_document_enc_id) => {
-        let data = { assigned_document_enc_id: assigned_document_enc_id, status: status };
+    const handleStatus = async (status, assigned_document_enc_id, reason = null) => {
+        let data = {
+            assigned_document_enc_id: assigned_document_enc_id,
+            status: status,
+            reason: reason,
+        };
         await axios
             .post(`${import.meta.env.VITE_API_BASE_PATH}update-document-status`, data, {
                 headers: {
@@ -226,6 +231,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                 console.log(error);
             });
     };
+
     useEffect(() => {
         if (showSidebar || params.id) {
             getUserDetails(showSidebar ? showSidebar : params.id);
@@ -240,12 +246,20 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
             ) : (
                 ''
             )}
-            <div className={`${pageType ? `expend-detail ${showSidebar === false ? 'expend-detail-close' : ''}` : ""}`}>
-                {pageType ? 
+            <div
+                className={`${
+                    pageType
+                        ? `expend-detail ${showSidebar === false ? 'expend-detail-close' : ''}`
+                        : ''
+                }`}
+            >
+                {pageType ? (
                     <div className="closeIcon">
                         <AiFillCloseCircle size={20} onClick={() => hideSideBar()} />
                     </div>
-                : ""}
+                ) : (
+                    ''
+                )}
                 <PerfectScrollbar>
                     <div className="expend-data expand-data-details">
                         <div className="row mb-4">
@@ -293,9 +307,9 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                 ? userDetails.documents.map((value, index) => {
                                       return (
                                           <div className="col-md-4" key={`doc-${index}`}>
-                                              <div class="status-card">
+                                              <div className="status-card">
                                                   <span
-                                                      class={`status-badge  ${
+                                                      className={`status-badge  ${
                                                           value.is_uploaded === '0'
                                                               ? 'bg-warning'
                                                               : value.is_uploaded === '1'
@@ -314,10 +328,10 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                           : 'Rejected'}
                                                   </span>
 
-                                                  <div class="content">
-                                                      <div class="label">{value.document_name}</div>
+                                                  <div className="content">
+                                                      <div className="label">{value.document_name}</div>
                                                       <label
-                                                          class="add-btn"
+                                                          className="add-btn"
                                                           htmlFor={`doc-${index}`}
                                                       >
                                                           <FaPlus color="#fff" fontSize={'16'} />
@@ -358,7 +372,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                   className="documentView"
                                               >
                                                   <span
-                                                      class={`status-badge  ${
+                                                      className={`status-badge  ${
                                                           value.is_uploaded === '2'
                                                               ? 'bg-success'
                                                               : value.is_uploaded === '3'
@@ -393,12 +407,15 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                           <button
                                                               className="icon-btn"
                                                               size="sm"
-                                                              onClick={() =>
-                                                                  handleStatus(
+                                                              onClick={() => {
+                                                                  setShowRejectionModal(
+                                                                      value.assigned_document_enc_id
+                                                                  );
+                                                                handleStatus(
                                                                       '3',
                                                                       value.assigned_document_enc_id
-                                                                  )
-                                                              }
+                                                                  );
+                                                              }}
                                                           >
                                                               <MdClose />
                                                           </button>
@@ -427,6 +444,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                     </div>
                 </PerfectScrollbar>
             </div>
+            <RejectionReasonModal show={showRejectionModal} hide={() => setShowRejectionModal(false)} />
         </div>
     );
 };

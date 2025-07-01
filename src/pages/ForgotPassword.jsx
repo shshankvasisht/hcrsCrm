@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useTransition } from 'react';
 import { Container, Row, Col, Card, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
@@ -11,22 +11,15 @@ const ForgotPassword = () => {
         handleSubmit,
         formState: { errors },
     } = useForm({});
-    const navigate = useNavigate();
     const [isLoading, startTransition] = useTransition();
 
     const handleLogin = (values) => {
         startTransition(async () => {
             await axios
-                .post(`${import.meta.env.VITE_API_BASE_PATH}loginn`, values)
+                .post(`${import.meta.env.VITE_API_BASE_PATH}forgot-password`, values)
                 .then((response) => {
-                    if (response.status === 200) {
-                        localStorage.setItem('token', response.data.token);
-                        localStorage.setItem('user', JSON.stringify(response.data.user));
-                        if (response.data.user.user_type === '2') {
-                            navigate('/admin/dashboard');
-                        } else {
-                            navigate('/user/dashboard');
-                        }
+                    if (response.data.status === 200) {
+                       toast.success('Please check your registered email');
                     } else {
                         toast.error('Invaid Login Credentials');
                     }
@@ -56,6 +49,21 @@ const ForgotPassword = () => {
                                     </div>
 
                                     <Form onSubmit={handleSubmit(handleLogin)}>
+                                        <Form.Group className="mb-3" controlId="formEmail">
+                                            <Form.Label>Username</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Username"
+                                                className="rounded-3"
+                                                {...register('username', {
+                                                    required: 'This field is required',
+                                                })}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errors.name?.message}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+
                                         <Form.Group className="mb-3" controlId="formEmail">
                                             <Form.Label>Registered Email</Form.Label>
                                             <Form.Control
