@@ -6,12 +6,13 @@ import ResetPassword from './pages/ResetPassword';
 
 const MainRoutes = () => {
     const user = JSON.parse(localStorage.getItem('user'));
+    const token = JSON.parse(localStorage.getItem('token'));
     return (
         <Routes>
             <Route
                 path="/"
                 element={
-                    user ? (
+                    user && token ? (
                         user.user_type === '2' ? (
                             <Navigate to="/admin/dashboard" replace />
                         ) : (
