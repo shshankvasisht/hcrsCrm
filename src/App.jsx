@@ -14,6 +14,7 @@ function App() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        console.log(token, "123");
         if (token) {
             try {
                 const decoded = jwtDecode(token);

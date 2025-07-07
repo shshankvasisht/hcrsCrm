@@ -181,9 +181,9 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
         }
     };
 
-    const handleStatus = async (status, assigned_document_enc_id, reason = null) => {
+    const handleStatus = async (status, uploaded_document_enc_id, reason = null) => {
         let data = {
-            assigned_document_enc_id: assigned_document_enc_id,
+            uploaded_document_enc_id: uploaded_document_enc_id,
             status: status,
             reason: reason,
         };
@@ -207,11 +207,11 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
             });
     };
 
-    const removeDocument = async (assigned_document_enc_id) => {
+    const removeDocument = async (uploaded_document_enc_id) => {
         await axios
             .post(
                 `${import.meta.env.VITE_API_BASE_PATH}remove-user-document`,
-                { assigned_document_enc_id: assigned_document_enc_id },
+                { uploaded_document_enc_id: uploaded_document_enc_id },
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -389,7 +389,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                   <img src="/images/pdf.svg" />
                                                   <p>{value.document_name}</p>
                                               </a>
-                                              <div className="d-flex gap-2 justify-content-center">
+                                              <div className="d-flex gap-2 justify-content-center mb-4">
                                                   {value.is_uploaded === '1' ? (
                                                       <>
                                                           <button
@@ -398,7 +398,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                               onClick={() =>
                                                                   handleStatus(
                                                                       '2',
-                                                                      value.assigned_document_enc_id
+                                                                      value.uploaded_document_enc_id
                                                                   )
                                                               }
                                                           >
@@ -409,11 +409,11 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                               size="sm"
                                                               onClick={() => {
                                                                   setShowRejectionModal(
-                                                                      value.assigned_document_enc_id
+                                                                      value.uploaded_document_enc_id
                                                                   );
                                                                 handleStatus(
                                                                       '3',
-                                                                      value.assigned_document_enc_id
+                                                                      value.uploaded_document_enc_id
                                                                   );
                                                               }}
                                                           >
@@ -426,7 +426,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                           size="sm"
                                                           onClick={() =>
                                                               removeDocument(
-                                                                  value.assigned_document_enc_id
+                                                                  value.uploaded_document_enc_id
                                                               )
                                                           }
                                                       >
