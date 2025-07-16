@@ -36,7 +36,7 @@ const Profiles = () => {
             )
             .then((response) => {
                 if (response.data.status === 200) {
-                    getProfiles();
+                    getProfiles({page: currentPage, limit: rowsPerPage});
                 }
             });
     };
@@ -189,7 +189,7 @@ const Profiles = () => {
                 handleClose={() => setShow(false)}
                 profileEdit={profileEdit}
                 setProfileEdit={setProfileEdit}
-                callback={() => getProfiles({page: 1, limit: rowsPerPage})}
+                callback={() => getProfiles({page: currentPage, limit: rowsPerPage})}
             />
         </div>
     );

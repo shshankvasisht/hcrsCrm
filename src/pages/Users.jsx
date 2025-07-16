@@ -100,7 +100,7 @@ const Users = () => {
             .then((response) => {
                 if (response.data.status === 200) {
                     toast.success('User Deleted Successfully');
-                    getUsers();
+                    getUsers({ page: currentPage, limit: rowsPerPage });
                 }
             })
             .catch((error) => {
@@ -221,7 +221,7 @@ const Users = () => {
                 updateUser={updateUser}
                 setUpdateUser={setUpdateUser}
                 handleClose={() => setShowModal(false)}
-                callback={() => getUsers({ page: 1, limit: rowsPerPage })}
+                callback={() => getUsers({ page: currentPage, limit: rowsPerPage })}
             />
             <UserDetailSidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} pageType="sidebar"/>
         </div>

@@ -73,7 +73,7 @@ const Documents = () => {
             .then((response) => {
                 if (response.data.status === 200) {
                     toast.success('Document deleted successfully');
-                    getDocuments();
+                    getDocuments({ page: currentPage, limit: rowsPerPage });
                 } else {
                     toast.error('Some error occurred');
                 }
@@ -90,7 +90,7 @@ const Documents = () => {
 
     const callback = () => {
         setUpdateDocument('');
-        getDocuments({ page: 1, limit: rowsPerPage });
+        getDocuments({ page: currentPage, limit: rowsPerPage });
     };
 
     // ** Function to handle Pagination and get data
