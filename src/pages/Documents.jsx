@@ -90,7 +90,7 @@ const Documents = () => {
 
     const callback = () => {
         setUpdateDocument('');
-        getDocuments();
+        getDocuments({ page: 1, limit: rowsPerPage });
     };
 
     // ** Function to handle Pagination and get data
@@ -190,7 +190,7 @@ const Documents = () => {
                 handleClose={() => setShow(false)}
                 updateDocument={updateDocument}
                 setUpdateDocument={setUpdateDocument}
-                callback={() => callback({ page: 1, limit: rowsPerPage })}
+                callback={() => callback()}
             />
         </div>
     );
