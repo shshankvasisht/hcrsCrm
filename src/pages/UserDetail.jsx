@@ -310,8 +310,9 @@ const UserDetail = () => {
                                                   id={`doc-${index}`}
                                                   type="file"
                                                   multiple
-                                                  accept=".png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
+                                                  accept="image/*, .png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
                                                   placeholder="Choose File"
+                                                  capture="environment" 
                                                   className="form-control d-none"
                                                   onChange={(e) =>
                                                       uploadDocument(
@@ -372,8 +373,9 @@ const UserDetail = () => {
                                                 id={`doc-${index}`}
                                                 type="file"
                                                 multiple
-                                                accept=".png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
+                                                accept="image/*, .png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
                                                 placeholder="Choose File"
+                                                capture="environment" 
                                                 className="form-control d-none"
                                                 onChange={(e) =>
                                                     uploadRejectedDocument(

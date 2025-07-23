@@ -20,7 +20,7 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
         watch,
         formState: { errors },
     } = useForm({
-          defaultValues: {
+        defaultValues: {
             status: true,
         },
     });
@@ -57,17 +57,23 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
             return false;
         }
 
-        if(updateUser){
-            data.user_enc_id = updateUser.user_id
+        if (updateUser) {
+            data.user_enc_id = updateUser.user_id;
         }
 
         startTransition(async () => {
             await axios
-                .post(`${import.meta.env.VITE_API_BASE_PATH}${updateUser ? 'update-user' : 'create-user'}`, data, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                })
+                .post(
+                    `${import.meta.env.VITE_API_BASE_PATH}${
+                        updateUser ? 'update-user' : 'create-user'
+                    }`,
+                    data,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        },
+                    }
+                )
                 .then((response) => {
                     if (response.data.status === 200) {
                         toast.success('User Created Successfully');
@@ -86,19 +92,20 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
 
     const onHide = () => {
         reset();
-        setUpdateUser("");
+        setUpdateUser('');
         handleClose();
-    }
+    };
 
     useEffect(() => {
-        if(updateUser){
-            setValue('fullName', updateUser.name ? updateUser.name : "");
-            setValue('phone', updateUser.phone ? updateUser.phone : "");
-            setValue('email', updateUser.email ? updateUser.email : "");
-            setValue('username', updateUser.username ? updateUser.username : "");
-            setValue('profile', updateUser.profile_enc_id ? updateUser.profile_enc_id : "");
+        if (updateUser) {
+            setValue('fullName', updateUser.name ? updateUser.name : '');
+            setValue('phone', updateUser.phone ? updateUser.phone : '');
+            setValue('email', updateUser.email ? updateUser.email : '');
+            setValue('username', updateUser.username ? updateUser.username : '');
+            setValue('profile', updateUser.profile_enc_id ? updateUser.profile_enc_id : '');
+            setValue('status', updateUser.status === '0' ? true : false);
         }
-    }, [updateUser])
+    }, [updateUser]);
 
     useEffect(() => {
         if (!effectRan.current) {
@@ -110,7 +117,7 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
     return (
         <Modal show={show} onHide={onHide} backdrop="static" centered size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>Create New User</Modal.Title>
+                <Modal.Title>{updateUser ? 'Update' : 'Create New'} User</Modal.Title>
             </Modal.Header>
 
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -174,9 +181,7 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
                             <Form.Group className="mb-3">
                                 <Form.Label>Username</Form.Label>
                                 <Form.Control
-                                    {...register('username', 
-                                        { required: 'Username is required' }
-                                    )}
+                                    {...register('username', { required: 'Username is required' })}
                                     type="text"
                                     placeholder="Enter username"
                                     onBlur={(e) => checkUsername(e.target.value)}
@@ -231,31 +236,32 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
                                           })
                                         : ''}
                                 </Form.Select>
-                                 <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalid">
                                     {errors.profile?.message}
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </div>
-                        <div className="col-md-6">
-                            <Form.Group className="mb-3">
-                                <Form.Label>Status</Form.Label>
-                                <Form.Check
-                                    type="switch"
-                                    label={status ? 'Active' : 'Inactive'}
-                                    {...register('status')}
-                                    checked={status}
-                                    onChange={(e) => setValue('status', e.target.checked)}
-                                />
-                            </Form.Group>
-                        </div>
+                        {updateUser ? (
+                            <div className="col-md-6">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Check
+                                        type="switch"
+                                        label={status ? 'Active' : 'Inactive'}
+                                        {...register('status')}
+                                        checked={status}
+                                        onChange={(e) => setValue('status', e.target.checked)}
+                                    />
+                                </Form.Group>
+                            </div>
+                        ) : (
+                            ''
+                        )}
                     </div>
                 </Modal.Body>
 
                 <Modal.Footer>
-                    <button type="button"
-                        className="btn-secondary"
-                        onClick={() => onHide()}
-                    >
+                    <button type="button" className="btn-secondary" onClick={() => onHide()}>
                         Cancel
                     </button>
                     {isLoading ? (
@@ -264,7 +270,7 @@ const CreateUserModal = ({ show, handleClose, setUpdateUser, updateUser, callbac
                         </button>
                     ) : (
                         <button type="submit" className="btn-red">
-                            Create
+                            {updateUser ? 'Update' : 'Create'}
                         </button>
                     )}
                 </Modal.Footer>
