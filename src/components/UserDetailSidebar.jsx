@@ -68,117 +68,103 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
     };
 
     const uploadDocument = (e, assigned_document_enc_id, filename) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const randomString = Math.random().toString(36).substring(2, 8);
-        const sanitizedName = filename.replace(/\s+/g, '_').toLowerCase();
-        const docName = `${userDetails.username}_${sanitizedName}_${randomString}.pdf`;
-
-        // Supported file types
-        const imageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        const pdfType = 'application/pdf';
-        const wordTypes = [
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ];
-
-        const isImage = imageTypes.includes(file.type);
-        const isPdf = file.type === pdfType;
-        const isWord = wordTypes.includes(file.type);
-
-        // Validate file type
-        if (!isImage && !isPdf && !isWord) {
-            toast.error('Unsupported file type. Please upload an image, PDF, or Word document.');
-            return;
-        }
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
 
         const formData = new FormData();
-        if (isImage) {
-            // Handle image files (convert to PDF with compression)
-            const reader = new FileReader();
+        let completed = 0;
+        const total = files.length;
 
-            reader.onload = async (event) => {
-                const imgData = event.target.result;
-                const img = new Image();
-                img.src = imgData;
-
-                img.onload = async () => {
-                    // Compress using canvas
-                    const canvas = document.createElement('canvas');
-                    const maxWidth = 800;
-                    const scale = maxWidth / img.width;
-                    canvas.width = maxWidth;
-                    canvas.height = img.height * scale;
-
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    const compressedImage = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
-
-                    const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4',
-                    });
-
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const margin = 10;
-                    const contentWidth = pdfWidth - 2 * margin;
-                    const contentHeight = canvas.height * (contentWidth / canvas.width);
-
-                    pdf.addImage(
-                        compressedImage,
-                        'JPEG',
-                        margin,
-                        margin,
-                        contentWidth,
-                        contentHeight
-                    );
-                    const pdfBlob = pdf.output('blob');
-
-                    formData.append('file', pdfBlob, `${docName}.pdf`);
-                    formData.append('assigned_document_enc_id', assigned_document_enc_id);
-
-                    await uploadFile(formData);
-                };
-            };
-
-            reader.readAsDataURL(file);
-        } else if (isPdf || isWord) {
-            // Handle PDF and Word files (upload directly)
-            const fileExtension = isPdf ? '.pdf' : '.docx';
-            formData.append('file', file, `${docName}${fileExtension}`);
+        function sendFiles() {
             formData.append('assigned_document_enc_id', assigned_document_enc_id);
+            formData.append('document_name', filename);
+            formData.append('user_enc_id', userDetails.id);
 
-            uploadFile(formData);
-        }
-
-        async function uploadFile(formData) {
-            try {
-                const response = await axios.post(
-                    `${import.meta.env.VITE_API_BASE_PATH}upload-user-document`,
-                    formData,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`,
-                            'Content-Type': 'multipart/form-data',
-                        },
+            axios
+                .post(`${import.meta.env.VITE_API_BASE_PATH}upload-user-document`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                .then((response) => {
+                    if (response.data.status === 200) {
+                        toast.success('Documents uploaded successfully');
+                        getUserDetails(userDetails.id);
+                        getUploadedDocuments(userDetails.id);
+                    } else {
+                        toast.error('Upload failed');
                     }
-                );
-
-                if (response.data.status === 200) {
-                    toast.success('Document uploaded successfully');
-                    getUserDetails(showSidebar ? showSidebar : params.id);
-                    getUploadedDocuments(showSidebar ? showSidebar : params.id);
-                } else {
-                    toast.error('Some error occurred');
-                }
-            } catch (err) {
-                console.error('Upload error:', err);
-                toast.error('Upload failed');
-            }
+                })
+                .catch((err) => {
+                    console.error('Upload error:', err);
+                    toast.error('Error uploading documents');
+                });
         }
+
+        files.forEach((file) => {
+            const randomString = Math.random().toString(36).substring(2, 8);
+            const sanitizedName = filename.replace(/\s+/g, '_').toLowerCase();
+
+            if (file.type.startsWith('image/')) {
+                // Always save as PDF after conversion
+                const docName = `${userDetails.username}_${sanitizedName}_${randomString}.pdf`;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxWidth = 800;
+                        const scale = maxWidth / img.width;
+                        canvas.width = maxWidth;
+                        canvas.height = img.height * scale;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                        const compressedImage = canvas.toDataURL('image/jpeg', 0.7);
+
+                        const pdf = new jsPDF({
+                            orientation: 'portrait',
+                            unit: 'mm',
+                            format: 'a4',
+                        });
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const margin = 10;
+                        const contentWidth = pdfWidth - 2 * margin;
+                        const contentHeight = canvas.height * (contentWidth / canvas.width);
+
+                        pdf.addImage(
+                            compressedImage,
+                            'JPEG',
+                            margin,
+                            margin,
+                            contentWidth,
+                            contentHeight
+                        );
+                        const pdfBlob = pdf.output('blob');
+
+                        // Append as PDF
+                        formData.append('files[]', pdfBlob, docName);
+
+                        completed++;
+                        if (completed === total) sendFiles();
+                    };
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Keep original extension for non-images
+                const extension = file.name.split('.').pop();
+                const docName = `${userDetails.username}_${sanitizedName}_${randomString}.${extension}`;
+
+                formData.append('files[]', file, docName);
+                completed++;
+                if (completed === total) sendFiles();
+            }
+        });
     };
 
     const handleStatus = async (status, uploaded_document_enc_id, reason = null) => {
@@ -329,7 +315,9 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                   </span>
 
                                                   <div className="content">
-                                                      <div className="label">{value.document_name}</div>
+                                                      <div className="label">
+                                                          {value.document_name}
+                                                      </div>
                                                       <label
                                                           className="add-btn"
                                                           htmlFor={`doc-${index}`}
@@ -339,8 +327,8 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                       <input
                                                           id={`doc-${index}`}
                                                           type="file"
-                                                          min={1}
-                                                          accept=".png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
+                                                          multiple
+                                                          accept="image/*, .png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
                                                           placeholder="Choose File"
                                                           className="form-control d-none"
                                                           onChange={(e) =>
@@ -411,7 +399,7 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                                                                   setShowRejectionModal(
                                                                       value.uploaded_document_enc_id
                                                                   );
-                                                                handleStatus(
+                                                                  handleStatus(
                                                                       '3',
                                                                       value.uploaded_document_enc_id
                                                                   );
@@ -444,7 +432,10 @@ const UserDetailSidebar = ({ showSidebar, setShowSidebar, pageType = null }) => 
                     </div>
                 </PerfectScrollbar>
             </div>
-            <RejectionReasonModal show={showRejectionModal} hide={() => setShowRejectionModal(false)} />
+            <RejectionReasonModal
+                show={showRejectionModal}
+                hide={() => setShowRejectionModal(false)}
+            />
         </div>
     );
 };
