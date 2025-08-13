@@ -312,7 +312,7 @@ const UserDetail = () => {
                                                   multiple
                                                   accept="image/*, .png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
                                                   placeholder="Choose File"
-                                                  capture="environment" 
+                                                //   capture="environment" 
                                                   className="form-control d-none"
                                                   onChange={(e) =>
                                                       uploadDocument(
@@ -375,7 +375,7 @@ const UserDetail = () => {
                                                 multiple
                                                 accept="image/*, .png, .jpg, .jpeg, .pdf, .xls, .xlsx, .doc, .docx"
                                                 placeholder="Choose File"
-                                                capture="environment" 
+                                                // capture="environment" 
                                                 className="form-control d-none"
                                                 onChange={(e) =>
                                                     uploadRejectedDocument(
